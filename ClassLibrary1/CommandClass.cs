@@ -196,6 +196,184 @@ namespace AutoCADPlugin_helloWorld
                 // Dispose of the transaction
             }
         }
+        [CommandMethod("AddPointAndSetPointStyle")]
+        public static void AddPointAndSetPointStyle()
+        {
+            // Get the current document and database
+            Document acDoc = Application.DocumentManager.MdiActiveDocument;
+            Database acCurDb = acDoc.Database;
+
+            // Start a transaction
+            using (Transaction acTrans = acCurDb.TransactionManager.StartTransaction())
+            {
+                // Open the Block table for read
+                BlockTable acBlkTbl;
+                acBlkTbl = acTrans.GetObject(acCurDb.BlockTableId,
+                                                OpenMode.ForRead) as BlockTable;
+
+                // Open the Block table record Model space for write
+                BlockTableRecord acBlkTblRec;
+                acBlkTblRec = acTrans.GetObject(acBlkTbl[BlockTableRecord.ModelSpace],
+                                                OpenMode.ForWrite) as BlockTableRecord;
+
+                // Create a point at (4, 3, 0) in Model space
+                using (DBPoint acPoint = new DBPoint(new Point3d(4, 3, 0)))
+                {
+                    // Add the new object to the block table record and the transaction
+                    acBlkTblRec.AppendEntity(acPoint);
+                    acTrans.AddNewlyCreatedDBObject(acPoint, true);
+                }
+
+                // Set the style for all point objects in the drawing
+                acCurDb.Pdmode = 34;
+                acCurDb.Pdsize = 1;
+
+                // Save the new object to the database
+                acTrans.Commit();
+            }
+        }
+        [CommandMethod("AddRegion")]
+        public static void AddRegion()
+        {
+            // Get the current document and database
+            Document acDoc = Application.DocumentManager.MdiActiveDocument;
+            Database acCurDb = acDoc.Database;
+
+            // Start a transaction
+            using (Transaction acTrans = acCurDb.TransactionManager.StartTransaction())
+            {
+                // Open the Block table for read
+                BlockTable acBlkTbl;
+                acBlkTbl = acTrans.GetObject(acCurDb.BlockTableId,
+                                                OpenMode.ForRead) as BlockTable;
+
+                // Open the Block table record Model space for write
+                BlockTableRecord acBlkTblRec;
+                acBlkTblRec = acTrans.GetObject(acBlkTbl[BlockTableRecord.ModelSpace],
+                                                OpenMode.ForWrite) as BlockTableRecord;
+
+                // Create an in memory circle
+                using (Circle acCirc = new Circle())
+                {
+                    acCirc.Center = new Point3d(2, 2, 0);
+                    acCirc.Radius = 5;
+
+                    // Adds the circle to an object array
+                    DBObjectCollection acDBObjColl = new DBObjectCollection();
+                    acDBObjColl.Add(acCirc);
+
+                    // Calculate the regions based on each closed loop
+                    DBObjectCollection myRegionColl = new DBObjectCollection();
+                    myRegionColl = Region.CreateFromCurves(acDBObjColl);
+                    Region acRegion = myRegionColl[0] as Region;
+
+                    // Add the new object to the block table record and the transaction
+                    acBlkTblRec.AppendEntity(acRegion);
+                    acTrans.AddNewlyCreatedDBObject(acRegion, true);
+
+                    // Dispose of the in memory circle not appended to the database
+                }
+
+                // Save the new object to the database
+                acTrans.Commit();
+            }
+        }
+        [CommandMethod("AddLightweightPolyline")]
+        public static void AddLightweightPolyline()
+        {
+            // Get the current document and database
+            Document acDoc = Application.DocumentManager.MdiActiveDocument;
+            Database acCurDb = acDoc.Database;
+
+            // Start a transaction
+            using (Transaction acTrans = acCurDb.TransactionManager.StartTransaction())
+            {
+                // Open the Block table for read
+                BlockTable acBlkTbl;
+                acBlkTbl = acTrans.GetObject(acCurDb.BlockTableId,
+                                                OpenMode.ForRead) as BlockTable;
+
+                // Open the Block table record Model space for write
+                BlockTableRecord acBlkTblRec;
+                acBlkTblRec = acTrans.GetObject(acBlkTbl[BlockTableRecord.ModelSpace],
+                                                OpenMode.ForWrite) as BlockTableRecord;
+
+                // Create a polyline with two segments (3 points)
+                using (Polyline acPoly = new Polyline())
+                {
+                    acPoly.AddVertexAt(0, new Point2d(2, 4), 0, 0, 0);
+                    acPoly.AddVertexAt(1, new Point2d(4, 2), 0, 0, 0);
+                    acPoly.AddVertexAt(2, new Point2d(6, 4), 0, 0, 0);
+
+                    // Add the new object to the block table record and the transaction
+                    acBlkTblRec.AppendEntity(acPoly);
+                    acTrans.AddNewlyCreatedDBObject(acPoly, true);
+                }
+
+                // Save the new object to the database
+                acTrans.Commit();
+            }
+        }
+        [CommandMethod("GetStringFromUser")]
+        public static void GetStringFromUser()
+        {
+            Document acDoc = Application.DocumentManager.MdiActiveDocument;
+
+            PromptStringOptions pStrOpts = new PromptStringOptions("\nEnter your name: ");
+            pStrOpts.AllowSpaces = true;
+            PromptResult pStrRes = acDoc.Editor.GetString(pStrOpts);
+
+            Application.ShowAlertDialog("The name entered was: " +
+                                        pStrRes.StringResult);
+        }
+        [CommandMethod("DrawSomething")]
+        public static void DrawSomething()
+        {
+            // Get the current document and database
+            Document acDoc = Application.DocumentManager.MdiActiveDocument;
+            Database acCurDb = acDoc.Database;
+
+            //получение строчки
+            PromptStringOptions pStrOpts = new PromptStringOptions("\nSquare Size: ");
+            pStrOpts.AllowSpaces = true;
+            PromptResult pStrRes = acDoc.Editor.GetString(pStrOpts);
+            string SSize = pStrRes.StringResult;
+            bool flag;
+            int result;
+            flag = int.TryParse(SSize, out result);
+
+            // Start a transaction
+            using (Transaction acTrans = acCurDb.TransactionManager.StartTransaction())
+            {
+                // Open the Block table for read
+                BlockTable acBlkTbl;
+                acBlkTbl = acTrans.GetObject(acCurDb.BlockTableId,
+                                                OpenMode.ForRead) as BlockTable;
+
+                // Open the Block table record Model space for write
+                BlockTableRecord acBlkTblRec;
+                acBlkTblRec = acTrans.GetObject(acBlkTbl[BlockTableRecord.ModelSpace],
+                                                OpenMode.ForWrite) as BlockTableRecord;
+
+                // Create a polyline with two segments (3 points)
+                using (Polyline acPoly = new Polyline())
+                {
+                    acPoly.AddVertexAt(0, new Point2d(0, 0), 0, 0, 0);
+                    acPoly.AddVertexAt(1, new Point2d(0, result), 0, 0, 0);
+                    acPoly.AddVertexAt(2, new Point2d(result, result), 0, 0, 0);
+                    acPoly.AddVertexAt(3, new Point2d(result, 0), 0, 0, 0);
+                    acPoly.AddVertexAt(4, new Point2d(0, 0), 0, 0, 0);
+
+                    // Add the new object to the block table record and the transaction
+                    acBlkTblRec.AppendEntity(acPoly);
+                    acTrans.AddNewlyCreatedDBObject(acPoly, true);
+                }
+
+                // Save the new object to the database
+                acTrans.Commit();
+            }
+        }
+
     }
     //оля))) 123
 }
