@@ -165,7 +165,7 @@ namespace AutoCADPlugin_helloWorld
 
                                 AttributeReference acAttRef = dbObj as AttributeReference;
 
-                                strMessage = strMessage + "Tag: " + acAttRef.Tag + "\n" +
+                                strMessage = strMessage + "Tajg: " + acAttRef.Tag + "\n" +
                                                 "Value: " + acAttRef.TextString + "\n";
 
                                 // Change the value of the attribute
@@ -197,4 +197,5 @@ namespace AutoCADPlugin_helloWorld
             }
         }
     }
+    //оля))) 123
 }
